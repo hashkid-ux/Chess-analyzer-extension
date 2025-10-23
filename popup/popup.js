@@ -133,7 +133,7 @@
     });
 
     // Mode buttons
-    $('.mode-btn').forEach(btn => {
+    $$('.mode-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const mode = btn.dataset.mode;
         try {
@@ -154,7 +154,7 @@
     });
 
     // Speed buttons
-    $('.speed-btn').forEach(btn => {
+    $$('.speed-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const speed = btn.dataset.speed;
         try {
@@ -201,7 +201,7 @@
     $('engineSelect').value = settings.defaultEngine;
 
     // Highlight active mode
-    $('.mode-btn').forEach(btn => {
+    $$('.mode-btn').forEach(btn => {
       if (btn.dataset.mode === settings.defaultMode) {
         btn.style.opacity = '1';
       } else {
@@ -210,7 +210,7 @@
     });
 
     // Highlight active speed
-    $('.speed-btn').forEach(btn => {
+    $$('.speed-btn').forEach(btn => {
       if (btn.dataset.speed === settings.moveSpeed) {
         btn.style.opacity = '1';
       } else {
@@ -248,4 +248,5 @@
   document.addEventListener('DOMContentLoaded', init);
 
   console.log('✅ Popup script loaded');
+
 })();
