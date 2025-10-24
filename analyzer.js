@@ -158,6 +158,52 @@
         unlimited: 0
     };
 
+    // SUBSCRIPTION CHECK - ADD AT LINE 1
+let SUBSCRIPTION_ACTIVE = false;
+let ANALYSES_TODAY = 0;
+let DAILY_LIMIT = 50; // Free tier limit
+
+async function checkSubscriptionStatus() {
+    try {
+        const data = await chrome.storage.sync.get(['subscription', 'subscriptionExpiry', 'analysisCount', 'lastResetDate']);
+        
+        const now = Date.now();
+        const expiry = data.subscriptionExpiry || 0;
+        
+        // Reset daily count
+        const today = new Date().toDateString();
+        if (data.lastResetDate !== today) {
+            ANALYSES_TODAY = 0;
+            await chrome.storage.sync.set({ analysisCount: 0, lastResetDate: today });
+        } else {
+            ANALYSES_TODAY = data.analysisCount || 0;
+        }
+        
+        SUBSCRIPTION_ACTIVE = expiry > now;
+        return SUBSCRIPTION_ACTIVE;
+    } catch (error) {
+        console.error('Subscription check failed:', error);
+        return false;
+    }
+}
+
+async function incrementAnalysisCount() {
+    if (!SUBSCRIPTION_ACTIVE) {
+        ANALYSES_TODAY++;
+        await chrome.storage.sync.set({ analysisCount: ANALYSES_TODAY });
+    }
+}
+
+function canAnalyze() {
+    if (SUBSCRIPTION_ACTIVE) return true;
+    return ANALYSES_TODAY < DAILY_LIMIT;
+}
+
+function getRemainingAnalyses() {
+    if (SUBSCRIPTION_ACTIVE) return '∞';
+    return Math.max(0, DAILY_LIMIT - ANALYSES_TODAY);
+}
+
     // ============================================
     // UTILITY FUNCTIONS
     // ============================================
@@ -950,6 +996,22 @@
 
     async function analyzePosition(fen, moveCount, turnText) {
         if (!fen) return;
+
+        // CHECK SUBSCRIPTION BEFORE ANALYZING
+    const hasSubscription = await checkSubscriptionStatus();
+
+         if (!canAnalyze()) {
+        showStatus("Daily limit reached! Upgrade to Pro", turnText, "error");
+        
+        // Show upgrade prompt after 1 second
+        setTimeout(() => {
+            if (window.chessAnalyzerPayment) {
+                window.chessAnalyzerPayment.showUpgradePrompt();
+            }
+        }, 1000);
+        
+        return;
+    }
 
         if (state.analysisController) {
             state.analysisController.abort();
@@ -1851,6 +1913,17 @@
                     <div id="status-text" style="flex: 1;">Waiting...</div>
                 </div>
 
+                <!-- SUBSCRIPTION STATUS -->
+<div id="subscription-status" style="padding: 12px; background: rgba(139, 92, 246, 0.1); border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(139, 92, 246, 0.25); display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <div style="font-size: 9px; color: #888; margin-bottom: 4px;">ANALYSES LEFT TODAY</div>
+        <div id="analyses-left" style="font-size: 18px; font-weight: 900; color: #00e676;">--</div>
+    </div>
+    <button id="upgrade-btn" class="analyzer-btn" style="padding: 8px 16px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: #fff; font-size: 11px;">
+        <span style="margin-right: 4px;">👑</span> Upgrade
+    </button>
+</div>
+
                 <!-- STATS -->
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px;">
                     <div>
@@ -1903,7 +1976,12 @@
                 header.classList.add("collapsed");
             }
         };
-
+        // Add this inside setupOverlayListeners() function
+$("upgrade-btn").onclick = () => {
+    if (window.chessAnalyzerPayment) {
+        window.chessAnalyzerPayment.showSubscriptionModal();
+    }
+};
         $("engine-section-header").onclick = () => toggleSection("engine");
         $("automove-section-header").onclick = () => toggleSection("automove");
         $("movespeed-section-header").onclick = () => toggleSection("movespeed");
@@ -2109,7 +2187,7 @@
         }
     }
 
-    function displayResult(result, turnText, isQuick = false) {
+    async function displayResult(result, turnText, isQuick = false) {
         createOverlay();
 
         if (!result || !result.bestMoveUCI) return;
@@ -2165,6 +2243,10 @@
 
         drawArrow(result.bestMoveUCI.substring(0, 2), result.bestMoveUCI.substring(2, 4));
         showStatus(isQuick ? "Quick analysis..." : "Analysis complete", turnText, "complete");
+        
+        await incrementAnalysisCount();
+    updateSubscriptionBadge();
+    
     }
 
     function updateMoveDisplay(moveCount) {
@@ -2251,16 +2333,36 @@
         startRealTimeFENMonitor();
     }
 
+    function updateSubscriptionBadge() {
+    const statusEl = document.getElementById("analyses-left");
+    if (statusEl) {
+        const remaining = getRemainingAnalyses();
+        statusEl.textContent = remaining;
+        
+        if (remaining !== '∞' && remaining < 10) {
+            statusEl.style.color = '#ff9800';
+        } else {
+            statusEl.style.color = '#00e676';
+        }
+    }
+}
+
     // ============================================
     // INITIALIZATION
     // ============================================
 
-    function initialize() {
+    async function initialize() {
         console.log("🎯 Initializing Smart Chess Analyzer Pro...");
 
-        createOverlay();
-        showStatus("Initializing...");
+         // CHECK SUBSCRIPTION ON START
+    await checkSubscriptionStatus();
+    console.log(`📊 Subscription: ${SUBSCRIPTION_ACTIVE ? 'ACTIVE' : 'FREE'} | Analyses: ${getRemainingAnalyses()}`);
+    
+    // REST OF ORIGINAL CODE...
+    createOverlay();
+    showStatus("Initializing...");
 
+    
         let attempts = 0;
         const checkInterval = setInterval(() => {
             attempts++;
@@ -2322,7 +2424,20 @@
             }
         },
 
-        enableAutoMove() {
+        async enableAutoMove() {
+            const hasSubscription = await checkSubscriptionStatus();
+        
+        if (!hasSubscription) {
+            console.warn('⚠️ Auto-move requires Pro subscription');
+            
+            setTimeout(() => {
+                if (window.chessAnalyzerPayment) {
+                    window.chessAnalyzerPayment.showFeatureLockedPrompt('Auto-Move');
+                }
+            }, 500);
+            
+            return false;
+        }
             const toggle = document.getElementById("automove-toggle");
             if (toggle) {
                 toggle.checked = true;

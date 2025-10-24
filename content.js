@@ -1,5 +1,4 @@
-// content.js - MUST HAVE THIS CODE
-// Content Script - Injects analyzer into page
+// content.js - Injects analyzer + crypto payment system
 (function() {
   'use strict';
 
@@ -14,17 +13,18 @@
   chrome.storage.sync.get({
     enabled: true,
     autoStart: true,
-    defaultEngine: 'stockfish',
+    defaultEngine: 'chessdb',
     defaultMode: 'blitz'
   }, (settings) => {
     console.log('📋 Settings:', settings);
 
-    const script = document.createElement('script');
-    script.src = chrome.runtime.getURL('analyzer.js');
-    script.onload = function() {
+    // INJECT ANALYZER SCRIPT
+    const analyzerScript = document.createElement('script');
+    analyzerScript.src = chrome.runtime.getURL('analyzer.js');
+    analyzerScript.onload = function() {
       console.log('✅ Analyzer injected');
       
-      if (window.chessSmartAnalyzer && settings.defaultEngine !== 'stockfish') {
+      if (window.chessSmartAnalyzer && settings.defaultEngine !== 'chessdb') {
         setTimeout(() => window.chessSmartAnalyzer.setEngine(settings.defaultEngine), 500);
       }
       
@@ -34,7 +34,16 @@
       
       this.remove();
     };
-    (document.head || document.documentElement).appendChild(script);
+    (document.head || document.documentElement).appendChild(analyzerScript);
+
+    // INJECT CRYPTO PAYMENT SCRIPT
+    const paymentScript = document.createElement('script');
+    paymentScript.src = chrome.runtime.getURL('crypto-payment.js');
+    paymentScript.onload = function() {
+      console.log('💰 Payment system injected');
+      this.remove();
+    };
+    (document.head || document.documentElement).appendChild(paymentScript);
   });
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -80,6 +89,12 @@
           break;
         case 'getStatus':
           sendResponse({ success: true, data: window.chessSmartAnalyzer.status() });
+          break;
+        case 'showSubscription':
+          if (window.chessAnalyzerPayment) {
+            window.chessAnalyzerPayment.showSubscriptionModal();
+          }
+          sendResponse({ success: true });
           break;
         default:
           sendResponse({ error: 'Unknown action' });
