@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chess Analyzer Pro</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 360px;
+      font-family: 'Segoe UI', -apple-system, system-ui, sans-serif;
+      background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+      color: #fff;
+      padding: 0;
+    }
+
+    .header {
+      background: linear-gradient(135deg, rgba(0, 230, 118, 0.2) 0%, rgba(0, 200, 100, 0.1) 100%);
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-icon {
+      font-size: 32px;
+    }
+
+    .header-text h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #00e676;
+      letter-spacing: 0.3px;
+    }
+
+    .header-text p {
+      font-size: 10px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .content {
+      padding: 16px;
+    }
+
+    .status-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .status-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .status-label {
+      font-size: 11px;
+      color: #888;
+      font-weight: 600;
+    }
+
+    .status-value {
+      font-size: 13px;
+      color: #00e676;
+      font-weight: 700;
+    }
+
+    .section {
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 10px;
+      color: #888;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00e676 0%, #00c853 100%);
+      border-color: #00e676;
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #00ff88 0%, #00e676 100%);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff4646 100%);
+      border-color: #ff6b6b;
+    }
+
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #ff8888 0%, #ff6b6b 100%);
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .btn-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .btn-small {
+      padding: 8px;
+      font-size: 11px;
+    }
+
+    .select-wrapper {
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      appearance: none;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #00e676;
+    }
+
+    .select-wrapper::after {
+      content: '▼';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 8px;
+      color: #888;
+      pointer-events: none;
+    }
+
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: rgba(255, 193, 7, 0.08);
+      border: 1px solid rgba(255, 193, 7, 0.2);
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .toggle-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffc107;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      transition: 0.3s;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+      background-color: #00e676;
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+    }
+
+    .warning {
+      background: rgba(255, 152, 0, 0.1);
+      border: 1px solid rgba(255, 152, 0, 0.3);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 10px;
+      color: #ff9800;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer {
+      padding: 12px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: #666;
+    }
+
+    .footer a {
+      color: #00e676;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: #888;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .spinner {
+      display: inline-block;
+      animation: spin 1s linear infinite;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-icon">♟️</div>
+    <div class="header-text">
+      <h1>Chess Analyzer Pro</h1>
+      <p>Multi-Engine Analysis</p>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="loading" id="loading">
+      <div class="spinner">⚙️</div>
+      <p>Connecting to page...</p>
+    </div>
+
+    <div id="main-content" style="display: none;">
+      <!-- Status Card -->
+      <div class="status-card">
+        <div class="status-row">
+          <span class="status-label">Status</span>
+          <span class="status-value" id="status">⏳ Checking...</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Engine</span>
+          <span class="status-value" id="engine">--</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Mode</span>
+          <span class="status-value" id="mode">--</span>
+        </div>
+      </div>
+
+      <!-- Auto-Move Toggle -->
+      <div class="toggle-wrapper">
+        <span class="toggle-label">🤖 Auto-Move</span>
+        <label class="toggle">
+          <input type="checkbox" id="autoMoveToggle">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="warning">
+        <span>⚠️</span>
+        <span>Auto-move is for LEARNING ONLY - Never use in live/rated games!</span>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="section">
+        <div class="section-title">Quick Actions</div>
+        <div class="btn-grid">
+          <button class="btn btn-primary" id="analyzeBtn">
+            <span>🔍</span> Analyze
+          </button>
+          <button class="btn" id="moveNowBtn">
+            <span>⚡</span> Move Now
+          </button>
+        </div>
+      </div>
+
+      <!-- Engine Selection -->
+      <div class="section">
+        <div class="section-title">Select Engine</div>
+        <div class="select-wrapper">
+          <select id="engineSelect">
+            <option value="stockfish">🐟 Stockfish Online</option>
+            <option value="chessapi">🦆 Chess-API.com</option>
+            <option value="lichess">♟️ Lichess Cloud</option>
+            <option value="chessdb">📚 ChessDB</option>
+            <option value="custom">⚙️ Custom Engine</option>
+            <option value="local">🏠 Local Engine</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Time Control Mode -->
+      <div class="section">
+        <div class="section-title">Time Control</div>
+        <div class="btn-grid-3">
+          <button class="btn btn-small mode-btn" data-mode="bullet">⚡ Bullet</button>
+          <button class="btn btn-small mode-btn" data-mode="blitz">⚡ Blitz</button>
+          <button class="btn btn-small mode-btn" data-mode="rapid">🕐 Rapid</button>
+          <button class="btn btn-small mode-btn" data-mode="classical">👑 Classical</button>
+          <button class="btn btn-small mode-btn" data-mode="daily">📅 Daily</button>
+          <button class="btn btn-small mode-btn" data-mode="unlimited">♾️ Unlimited</button>
+        </div>
+      </div>
+
+      <!-- Move Speed -->
+      <div class="section">
+        <div class="section-title">Move Speed</div>
+        <div class="btn-grid">
+          <button class="btn btn-small speed-btn" data-speed="slow">🐌 Slow</button>
+          <button class="btn btn-small speed-btn" data-speed="normal">⚡ Normal</button>
+          <button class="btn btn-small speed-btn" data-speed="fast">🚀 Fast</button>
+          <button class="btn btn-small speed-btn" data-speed="instant">⚡⚡ Instant</button>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="section">
+        <button class="btn" id="settingsBtn">
+          <span>⚙️</span> Advanced Settings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>v2.0.0</span>
+    <a href="#" id="helpLink">📖 Help & Guide</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

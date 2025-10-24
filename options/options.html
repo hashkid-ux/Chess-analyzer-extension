@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chess Analyzer Pro - Settings</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, system-ui, sans-serif;
+      background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+      color: #fff;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      color: #00e676;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: #888;
+      font-size: 14px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .tab {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s ease;
+    }
+
+    .tab:hover {
+      color: #00e676;
+    }
+
+    .tab.active {
+      color: #00e676;
+      border-bottom-color: #00e676;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .section {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #00e676;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .setting-row:last-child {
+      border-bottom: none;
+    }
+
+    .setting-info {
+      flex: 1;
+    }
+
+    .setting-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .setting-description {
+      font-size: 12px;
+      color: #888;
+      line-height: 1.4;
+    }
+
+    .setting-control {
+      margin-left: 20px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="url"],
+    select {
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      min-width: 200px;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #00e676;
+    }
+
+    .toggle {
+      position: relative;
+      width: 50px;
+      height: 26px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      transition: 0.3s;
+      border-radius: 26px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+      background-color: #00e676;
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00e676 0%, #00c853 100%);
+      border-color: #00e676;
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #00ff88 0%, #00e676 100%);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff4646 100%);
+      border-color: #ff6b6b;
+    }
+
+    .alert {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .alert-warning {
+      background: rgba(255, 152, 0, 0.1);
+      border: 1px solid rgba(255, 152, 0, 0.3);
+      color: #ff9800;
+    }
+
+    .alert-info {
+      background: rgba(33, 150, 243, 0.1);
+      border: 1px solid rgba(33, 150, 243, 0.3);
+      color: #2196f3;
+    }
+
+    .alert-success {
+      background: rgba(0, 230, 118, 0.1);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      color: #00e676;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .engine-limits-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 12px;
+    }
+
+    .engine-limits-table th,
+    .engine-limits-table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .engine-limits-table th {
+      color: #00e676;
+      font-weight: 600;
+    }
+
+    .engine-limits-table td {
+      color: #ccc;
+    }
+
+    .status-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 14px 20px;
+      background: #00e676;
+      color: #000;
+      border-radius: 8px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 230, 118, 0.4);
+      transform: translateY(-100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .status-message.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .shortcut-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .shortcut-key {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #00e676;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>♟️ Chess Analyzer Pro - Settings</h1>
+      <p>Configure your chess analysis preferences</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="general">General</button>
+      <button class="tab" data-tab="engines">Engines</button>
+      <button class="tab" data-tab="automove">Auto-Move</button>
+      <button class="tab" data-tab="advanced">Advanced</button>
+      <button class="tab" data-tab="shortcuts">Shortcuts</button>
+    </div>
+
+    <!-- GENERAL TAB -->
+    <div class="tab-content active" id="general">
+      <div class="section">
+        <div class="section-title">🎯 General Settings</div>
+        
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Enable Extension</div>
+            <div class="setting-description">Master switch for the analyzer</div>
+          </div>
+          <div class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="enabled" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Auto-Start on Page Load</div>
+            <div class="setting-description">Automatically activate analyzer when you open Chess.com or Lichess</div>
+          </div>
+          <div class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="autoStart" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Auto-Detect Time Control</div>
+            <div class="setting-description">Automatically adjust depth based on game time control</div>
+          </div>
+          <div class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="autoDetectTime" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Visual Feedback</div>
+            <div class="setting-description">Arrow and highlight intensity</div>
+          </div>
+          <div class="setting-control">
+            <select id="visualFeedback">
+              <option value="none">None</option>
+              <option value="subtle">Subtle</option>
+              <option value="full">Full</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Default Engine</div>
+            <div class="setting-description">Engine to use on startup</div>
+          </div>
+          <div class="setting-control">
+            <select id="defaultEngine">
+              <option value="stockfish">Stockfish Online</option>
+              <option value="chessapi">Chess-API.com</option>
+              <option value="lichess">Lichess Cloud</option>
+              <option value="chessdb">ChessDB</option>
+              <option value="custom">Custom Engine</option>
+              <option value="local">Local Engine</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Default Time Control</div>
+            <div class="setting-description">Analysis depth preset</div>
+          </div>
+          <div class="setting-control">
+            <select id="defaultMode">
+              <option value="bullet">Bullet (D10-12)</option>
+              <option value="blitz">Blitz (D12-15)</option>
+              <option value="rapid">Rapid (D15-18)</option>
+              <option value="classical">Classical (D18-22)</option>
+              <option value="daily">Daily (D20-24)</option>
+              <option value="unlimited">Unlimited (D18-20)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENGINES TAB -->
+    <div class="tab-content" id="engines">
+      <div class="alert alert-info">
+        <span>ℹ️</span>
+        <span>Each engine has different capabilities and limitations. Choose based on your needs.</span>
+      </div>
+
+      <div class="section">
+        <div class="section-title">🔧 Engine Capabilities</div>
+        <table class="engine-limits-table">
+          <thead>
+            <tr>
+              <th>Engine</th>
+              <th>Max Depth</th>
+              <th>Move Limit</th>
+              <th>Best For</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>🐟 Stockfish Online</td>
+              <td>15</td>
+              <td>30 moves</td>
+              <td>Fast, reliable</td>
+            </tr>
+            <tr>
+              <td>🦆 Chess-API.com</td>
+              <td>20</td>
+              <td>20 moves</td>
+              <td>Early game</td>
+            </tr>
+            <tr>
+              <td>♟️ Lichess Cloud</td>
+              <td>20</td>
+              <td>40 moves</td>
+              <td>Mid-game</td>
+            </tr>
+            <tr>
+              <td>📚 ChessDB</td>
+              <td>20</td>
+              <td>Unlimited</td>
+              <td>Opening book</td>
+            </tr>
+            <tr>
+              <td>⚙️ Custom Engine</td>
+              <td>20</td>
+              <td>Unlimited</td>
+              <td>Your API</td>
+            </tr>
+            <tr>
+              <td>🏠 Local Engine</td>
+              <td>25</td>
+              <td>Unlimited</td>
+              <td>Privacy, power</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="section-title">⚙️ Custom Engine Configuration</div>
+        
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">API Endpoint URL</div>
+            <div class="setting-description">Full URL to your custom chess engine API</div>
+          </div>
+          <div class="setting-control">
+            <input type="url" id="customEngineUrl" placeholder="https://api.example.com/analyze">
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Response Format</div>
+            <div class="setting-description">API response format type</div>
+          </div>
+          <div class="setting-control">
+            <select id="customEngineFormat">
+              <option value="stockfish">Stockfish Format</option>
+              <option value="lichess">Lichess Format</option>
+              <option value="chessdb">ChessDB Format</option>
+              <option value="postApi">POST API (JSON)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Max Analysis Depth</div>
+            <div class="setting-description">Maximum depth for custom engine</div>
+          </div>
+          <div class="setting-control">
+            <input type="number" id="customEngineDepth" value="20" min="1" max="30">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">🏠 Local Engine Setup</div>
+        <div class="alert alert-info">
+          <span>ℹ️</span>
+          <div>
+            <div>Run your own Stockfish instance locally for maximum privacy and power.</div>
+            <div style="margin-top: 8px; font-size: 11px; opacity: 0.8;">
+              Example: <code>python local_engine_server.py</code> (see documentation)
+            </div>
+          </div>
+        </div>
+        
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Local Engine URL</div>
+            <div class="setting-description">Usually http://localhost:8080/analyze</div>
+          </div>
+          <div class="setting-control">
+            <input type="url" id="localEngineUrl" value="http://localhost:8080/analyze">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTO-MOVE TAB -->
+    <div class="tab-content" id="automove">
+      <div class="alert alert-warning">
+        <span>⚠️</span>
+        <span><strong>WARNING:</strong> Auto-move is for LEARNING and PRACTICE ONLY. Using it in rated or live games violates fair play policies and may result in account bans!</span>
+      </div>
+
+      <div class="section">
+        <div class="section-title">🤖 Auto-Move Settings</div>
+        
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Enable Auto-Move</div>
+            <div class="setting-description">Automatically execute best moves</div>
+          </div>
+          <div class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="autoMoveEnabled">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Safety Mode</div>
+            <div class="setting-description">Require confirmation before each move</div>
+          </div>
+          <div class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="safetyMode" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Block Live/Rated Games</div>
+            <div class="setting-description">Disable auto-move in competitive games</div>
+          </div>
+          <div class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="blockLiveGames" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Only My Turn</div>
+            <div class="setting-description">Only make moves when it's your turn</div>
+          </div>
+          <div class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="onlyMyTurn" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Humanize Movements</div>
+            <div class="setting-description">Add realistic mouse curves and delays</div>
+          </div>
+          <div class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="humanize" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Minimum Delay (seconds)</div>
+            <div class="setting-description">Minimum time before executing move</div>
+          </div>
+          <div class="setting-control">
+            <input type="number" id="minDelay" value="0" min="0" max="10" step="0.1">
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Maximum Delay (seconds)</div>
+            <div class="setting-description">Maximum random delay added</div>
+          </div>
+          <div class="setting-control">
+            <input type="number" id="maxDelay" value="0.2" min="0" max="30" step="0.1">
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Default Move Speed</div>
+            <div class="setting-description">Speed profile for dragging pieces</div>
+          </div>
+          <div class="setting-control">
+            <select id="moveSpeed">
+              <option value="slow">Slow (Careful)</option>
+              <option value="normal">Normal (Balanced)</option>
+              <option value="fast">Fast (Quick)</option>
+              <option value="instant">Instant (Lightning)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADVANCED TAB -->
+    <div class="tab-content" id="advanced">
+      <div class="section">
+        <div class="section-title">⚡ Performance Settings</div>
+        
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Debounce Delay (ms)</div>
+            <div class="setting-description">Time to wait after board changes before analyzing</div>
+          </div>
+          <div class="setting-control">
+            <input type="number" id="debounceMs" value="100" min="0" max="1000" step="10">
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Min Time Between Analyses (ms)</div>
+            <div class="setting-description">Prevent excessive API calls</div>
+          </div>
+          <div class="setting-control">
+            <input type="number" id="minTimeBetween" value="150" min="50" max="5000" step="50">
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Cache Size (positions)</div>
+            <div class="setting-description">Number of positions to cache in memory</div>
+          </div>
+          <div class="setting-control">
+            <input type="number" id="cacheSize" value="100" min="10" max="500" step="10">
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Overlay Z-Index</div>
+            <div class="setting-description">CSS z-index for analyzer overlay</div>
+          </div>
+          <div class="setting-control">
+            <input type="number" id="overlayZIndex" value="999999" min="1000" max="9999999">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">🔧 Developer Options</div>
+        
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">Enable Console Logging</div>
+            <div class="setting-description">Show detailed debug information in browser console</div>
+          </div>
+          <div class="setting-control">
+            <label class="toggle">
+              <input type="checkbox" id="debugMode">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-label">API Request Timeout (seconds)</div>
+            <div class="setting-description">Maximum time to wait for engine response</div>
+          </div>
+          <div class="setting-control">
+            <input type="number" id="apiTimeout" value="10" min="5" max="60">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">💾 Data Management</div>
+        
+        <div class="alert alert-warning">
+          <span>⚠️</span>
+          <span>These actions cannot be undone!</span>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 16px;">
+          <button class="btn" id="clearCacheBtn">🗑️ Clear Position Cache</button>
+          <button class="btn btn-danger" id="resetSettingsBtn">🔄 Reset All Settings</button>
+          <button class="btn btn-danger" id="resetStatsBtn">📊 Reset Statistics</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHORTCUTS TAB -->
+    <div class="tab-content" id="shortcuts">
+      <div class="section">
+        <div class="section-title">⌨️ Keyboard Shortcuts</div>
+        
+        <div class="alert alert-info">
+          <span>ℹ️</span>
+          <span>Use these shortcuts while on Chess.com or Lichess for quick access</span>
+        </div>
+
+        <div class="shortcut-item">
+          <span>Analyze Current Position</span>
+          <span class="shortcut-key">Ctrl + Shift + A</span>
+        </div>
+
+        <div class="shortcut-item">
+          <span>Toggle Analyzer Visibility</span>
+          <span class="shortcut-key">Ctrl + Shift + H</span>
+        </div>
+
+        <div class="shortcut-item">
+          <span>Change Time Control Mode</span>
+          <span class="shortcut-key">Ctrl + Shift + M</span>
+        </div>
+
+        <div class="shortcut-item">
+          <span>Execute Best Move (Auto-Move)</span>
+          <span class="shortcut-key">Ctrl + Shift + X</span>
+        </div>
+
+        <div style="margin-top: 20px; font-size: 12px; color: #888;">
+          <strong>Note:</strong> Keyboard shortcuts work when the chess board is focused on the page.
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">🎮 API Commands</div>
+        
+        <div class="alert alert-info">
+          <span>ℹ️</span>
+          <div>
+            <div>Access the analyzer programmatically from the browser console:</div>
+            <div style="margin-top: 8px; font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px; margin-top: 8px;">
+              <div>window.chessSmartAnalyzer.analyze()</div>
+              <div>window.chessSmartAnalyzer.setMode('blitz')</div>
+              <div>window.chessSmartAnalyzer.setEngine('stockfish')</div>
+              <div>window.chessSmartAnalyzer.enableAutoMove()</div>
+              <div>window.chessSmartAnalyzer.moveNow()</div>
+              <div>window.chessSmartAnalyzer.status()</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAVE BUTTONS -->
+    <div class="button-group">
+      <button class="btn" id="exportBtn">📤 Export Settings</button>
+      <button class="btn" id="importBtn">📥 Import Settings</button>
+      <button class="btn btn-primary" id="saveBtn">💾 Save All Settings</button>
+    </div>
+  </div>
+
+  <!-- Hidden file input for import -->
+  <input type="file" id="importFile" accept=".json" style="display: none;">
+
+  <!-- Status message -->
+  <div class="status-message" id="statusMessage"></div>
+
+  <script src="options.js"></script>
+</body>
+</html>
