@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Chess Smart Analyzer Pro",
-  "version": "2.0.0",
-  "description": "Advanced chess analysis with multi-engine support, auto-move, and humanized gameplay for Chess.com & Lichess",
+  "version": "2.1.0",
+  "description": "Advanced chess analysis with multi-engine support, auto-move, and crypto subscription system",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -11,7 +11,8 @@
   "permissions": [
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "alarms"
   ],
   "host_permissions": [
     "*://*.chess.com/*",
@@ -20,7 +21,11 @@
     "https://lichess.org/*",
     "https://www.chessdb.cn/*",
     "https://chess-api.com/*",
-    "http://localhost:*/*"
+    "http://localhost:*/*",
+    "https://api.coingecko.com/*",
+    "https://etherscan.io/*",
+    "https://polygonscan.com/*",
+    "https://bscscan.com/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",
@@ -46,7 +51,10 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["analyzer.js"],
+      "resources": [
+        "analyzer.js",
+        "crypto-payment.js"
+      ],
       "matches": [
         "*://*.chess.com/*",
         "*://*.lichess.org/*"
